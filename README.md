@@ -8,27 +8,16 @@
 
 My Workshop I project. A console program for the faculty to keep student, lecturer and course records, key in marks and work out GPA and CGPA with the UTeM grading scale. Data is stored in MySQL (XAMPP) through MySQL Connector/C++.
 
-<table>
-  <tr>
-    <td width="50%"><img src="docs/screenshots/key-in-marks.png" alt="Key In Marks"></td>
-    <td width="50%"><img src="docs/screenshots/course-report.png" alt="Course Performance Report"></td>
-  </tr>
-  <tr>
-    <td align="center"><b>Key In Marks</b></td>
-    <td align="center"><b>Course Performance Report</b></td>
-  </tr>
-</table>
+**Showcase:** https://cheah20.github.io/StudentManagementSystemCppVersion/
 
 <table>
   <tr>
-    <td width="33%"><img src="docs/screenshots/login.png" alt="Login"></td>
-    <td width="33%"><img src="docs/screenshots/lecturer-menu.png" alt="Lecturer Dashboard"></td>
-    <td width="33%"><img src="docs/screenshots/students.png" alt="View All Students"></td>
+    <td width="50%"><img src="docs/screenshots/key-in-marks.png" alt="Key In Marks"></td>
+    <td width="50%"><img src="docs/screenshots/course-grade-report.png" alt="Course Grade Report"></td>
   </tr>
   <tr>
-    <td align="center">Login</td>
-    <td align="center">Lecturer Dashboard</td>
-    <td align="center">View All Students</td>
+    <td align="center"><b>Key In Marks</b></td>
+    <td align="center"><b>Course Grade Report</b></td>
   </tr>
 </table>
 
@@ -75,6 +64,108 @@ The problem was split by user. Admin needs clean records with no duplicates, lec
 
 A new student gets the next matric number (`B032410XXX`), a university email and a first password from the last 6 digits of the IC. Passwords are shown as `*` while typing.
 
+## Screens
+
+All screenshots are from the program running in a Windows console with the sample data.
+
+### Login
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/login.png" alt="Login (password shows as *)"></td>
+    <td width="50%"><img src="docs/screenshots/admin-menu.png" alt="Admin Dashboard"></td>
+  </tr>
+  <tr>
+    <td align="center">Login (password shows as *)</td>
+    <td align="center">Admin Dashboard</td>
+  </tr>
+</table>
+
+### Admin
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/admin-people.png" alt="User Add On"></td>
+    <td width="50%"><img src="docs/screenshots/view-students.png" alt="View All Students"></td>
+  </tr>
+  <tr>
+    <td align="center">User Add On</td>
+    <td align="center">View All Students</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/add-student.png" alt="Add Student"></td>
+    <td width="50%"><img src="docs/screenshots/search-student.png" alt="Search Student"></td>
+  </tr>
+  <tr>
+    <td align="center">Add Student</td>
+    <td align="center">Search Student</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/view-lecturers.png" alt="View All Lecturers"></td>
+    <td width="50%"><img src="docs/screenshots/view-courses.png" alt="View All Courses"></td>
+  </tr>
+  <tr>
+    <td align="center">View All Lecturers</td>
+    <td align="center">View All Courses</td>
+  </tr>
+</table>
+
+### Lecturer
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/lecturer-login.png" alt="Lecturer Login"></td>
+    <td width="50%"><img src="docs/screenshots/lecturer-menu.png" alt="Lecturer Dashboard"></td>
+  </tr>
+  <tr>
+    <td align="center">Lecturer Login</td>
+    <td align="center">Lecturer Dashboard</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/my-courses.png" alt="My Courses"></td>
+    <td width="50%"><img src="docs/screenshots/my-students.png" alt="My Students"></td>
+  </tr>
+  <tr>
+    <td align="center">My Courses</td>
+    <td align="center">My Students</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/key-in-marks.png" alt="Key In Marks"></td>
+    <td width="50%"><img src="docs/screenshots/course-performance-report.png" alt="Course Performance Report"></td>
+  </tr>
+  <tr>
+    <td align="center">Key In Marks</td>
+    <td align="center">Course Performance Report</td>
+  </tr>
+</table>
+
+### Student
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/student-menu.png" alt="Student Dashboard"></td>
+    <td width="50%"><img src="docs/screenshots/profile.png" alt="My Profile"></td>
+  </tr>
+  <tr>
+    <td align="center">Student Dashboard</td>
+    <td align="center">My Profile</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/enrolled-courses.png" alt="Enrolled Courses"></td>
+    <td width="50%"><img src="docs/screenshots/performance.png" alt="Academic Performance"></td>
+  </tr>
+  <tr>
+    <td align="center">Enrolled Courses</td>
+    <td align="center">Academic Performance</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/transcript.png" alt="Generate Transcript"></td>
+  </tr>
+  <tr>
+    <td align="center">Generate Transcript</td>
+  </tr>
+</table>
+
 ## Business Rules
 
 - Matric numbers (`B032410XXX`) and staff IDs (`L001`) are unique.
@@ -99,6 +190,15 @@ Marks are 0 to 100. The total mark depends on the credit hours of the course.
 | GPA | 4.00 | 3.70 | 3.30 | 3.00 | 2.70 | 2.30 | 2.00 | 1.70 | 1.30 | 1.00 | 0.00 |
 
 CGPA = sum of (GPA × credit hours) / sum of credit hours. A student passes a course with 40 marks or more.
+
+Grades and CGPA are coloured on screen:
+
+| Colour | Grade | CGPA |
+|---|---|---|
+| Bright cyan, bold (Dean's List) | A, A- | 3.50 and above |
+| Cyan (pass and upper) | B+ to C | 2.50 to 3.49 |
+| Yellow (close to failing) | C-, D+, D | 2.00 to 2.49 |
+| Red (fail) | E | below 2.00 |
 
 ## Design
 
