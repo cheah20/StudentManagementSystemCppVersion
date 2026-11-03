@@ -48,6 +48,23 @@ The faculty kept student records by hand in separate files and folders. Records 
 2. Automatic calculation of total marks, grades, GPA and CGPA.
 3. Academic transcripts and course performance reports with a bar chart.
 
+## Timeline
+
+The project ran over 14 weeks.
+
+| Task | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Project Planning | ■ | ■ |  |  |  |  |  |  |  |  |  |  |  |  |
+| System Design |  |  | ■ | ■ |  |  |  |  |  |  |  |  |  |  |
+| Coding & Testing |  |  |  |  | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ |  |
+| Documentation |  |  |  |  |  |  |  |  |  |  |  | ■ | ■ | ■ |
+
+## Analysis
+
+The problem was split by user. Admin needs clean records with no duplicates, lecturers need grades worked out without maths mistakes, and students need to see their own results. The structured chart shows how login leads to each role and every function reads and writes the same MySQL database.
+
+<p align="center"><img src="docs/images/structured-chart.png" alt="Structured Chart" width="100%"></p>
+
 ## Features
 
 | Role | What it can do |
@@ -56,9 +73,15 @@ The faculty kept student records by hand in separate files and folders. Records 
 | Lecturer | View own courses and students. Enroll and drop students. Key in marks. Course performance report with bar chart, export to CSV or text |
 | Student | View profile, enrolled courses and results. Generate an academic transcript. Change password |
 
-- A new student gets the next matric number (`B032410XXX`), a university email and a first password from the last 6 digits of the IC.
-- Each role can only open its own menu after login.
-- Deleting a student also removes the user account and every enrollment.
+A new student gets the next matric number (`B032410XXX`), a university email and a first password from the last 6 digits of the IC. Passwords are shown as `*` while typing.
+
+## Business Rules
+
+- Matric numbers (`B032410XXX`) and staff IDs (`L001`) are unique.
+- Each user can only open the menu for their own role.
+- Course codes are unique and a course has 1, 2 or 3 credit hours.
+- Deleting a student also deletes their enrollments, marks and login.
+- Marks must be between 0 and 100, and 40 or more is a pass.
 
 ## Grading
 
@@ -77,22 +100,92 @@ Marks are 0 to 100. The total mark depends on the credit hours of the course.
 
 CGPA = sum of (GPA × credit hours) / sum of credit hours. A student passes a course with 40 marks or more.
 
-## Database
+## Design
 
 <table>
   <tr>
-    <td width="33%"><img src="docs/images/data-model.png" alt="ERD"></td>
-    <td width="33%"><img src="docs/images/normalization.png" alt="Normalization"></td>
-    <td width="33%"><img src="docs/images/flowchart.jpg" alt="Flowchart"></td>
+    <td width="55%"><img src="docs/images/flowchart.png" alt="Flowchart"></td>
+    <td width="45%" valign="top"><img src="docs/images/normalization.png" alt="Normalization"></td>
   </tr>
   <tr>
-    <td align="center">ERD</td>
-    <td align="center">Normalization</td>
     <td align="center">Flowchart</td>
+    <td align="center">Normalization</td>
   </tr>
 </table>
 
-Tables: `users`, `students`, `lecturers`, `courses` and `enrollments`. See [schema.sql](database/schema.sql).
+The ERD below matches [schema.sql](database/schema.sql). `users.username` holds the matric number or staff ID, so every student and lecturer has one login.
+
+```mermaid
+erDiagram
+    LECTURERS |o--o{ COURSES : teaches
+    STUDENTS ||--o{ ENROLLMENTS : takes
+    COURSES ||--o{ ENROLLMENTS : has
+    USERS ||..o| STUDENTS : "same id"
+    USERS ||..o| LECTURERS : "same id"
+
+    USERS {
+        varchar username PK
+        varchar password
+        varchar role
+    }
+    STUDENTS {
+        varchar matric_number PK
+        varchar name
+        varchar ic_number
+        varchar gender
+        varchar race
+        varchar religion
+        varchar country_birth
+        varchar marital_status
+        text address
+        varchar personal_email
+        varchar uni_email
+        varchar phone
+        int age
+        int semester
+        int year
+        varchar password
+        double gpa
+        double cgpa
+    }
+    LECTURERS {
+        varchar staff_id PK
+        varchar name
+        varchar department
+        varchar password
+    }
+    COURSES {
+        varchar course_code PK
+        varchar course_name
+        int credit_hours
+        int semester
+        int year
+        varchar staff_id FK
+    }
+    ENROLLMENTS {
+        int enrollment_id PK
+        varchar matric_number FK
+        varchar course_code FK
+        int semester
+        int year
+        double total_mark
+        varchar grade
+        double gpa
+        varchar status
+    }
+```
+
+## Programming Concepts
+
+| Concept | Where it is used |
+|---|---|
+| Naming convention | PascalCase classes (`AdminModule`), camelCase functions and variables (`keyInMarks`, `totalMark`), snake_case SQL columns (`matric_number`) |
+| Function | `addStudent()` makes the matric number, email and first password, then saves the student and the login |
+| Array | `char buffer[100]` formats the date in `getCurrentDateTime()`, `GRADES[]` keeps the grade order in reports |
+| Selection | `switch` in every menu, `if` chain in `calculateGrade()` |
+| Control | `while (true)` keeps each menu running until logout |
+| Pointer | One `sql::Connection*` shared by all modules, `unique_ptr` for every `PreparedStatement` and `ResultSet` |
+| Error handling | `try` / `catch (sql::SQLException&)` around queries; a failed connection leaves `conn` as `nullptr` |
 
 ## Getting Started
 
@@ -131,3 +224,11 @@ StudentManagementSystemCppVersion/
 │   └── sample_data.sql
 └── docs/                   # design and screenshots
 ```
+
+## Constraints and Future Work
+
+- It is a console program, so the interface is simpler than a GUI.
+- It connects to one local MySQL server (`127.0.0.1:3306`), which does not suit a campus network.
+- Results are only as accurate as the marks lecturers key in.
+
+Next steps would be a GUI or web version, a cloud database, checks on marks before they are saved, and a mobile app with result notifications.
