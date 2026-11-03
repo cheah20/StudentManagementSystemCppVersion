@@ -39,7 +39,14 @@ My Workshop I project. A console program for the faculty to keep student, lectur
 | Programme | Bachelor of Computer Science (Artificial Intelligence) |
 | Faculty | Faculty of Artificial Intelligence and Cyber Security, UTeM |
 | Semester | Year 2 Semester 1, 2025/2026 |
-| Documents | [Report](docs/Workshop%201%20Report.pdf) · [Analysis and Design](docs/Analysis%20and%20Design.pdf) · [Flowchart](docs/Flowchart.pdf) |
+
+## Problem and Objectives
+
+The faculty kept student records by hand in separate files and folders. Records were duplicated and hard to find, enrollment was slow, lecturers worked out grades and GPA with a calculator, and there were no ready reports on how a course performed.
+
+1. Three modules with full CRUD: Admin (users and courses), Lecturer (grading and enrollment) and Student (profile and transcript).
+2. Automatic calculation of total marks, grades, GPA and CGPA.
+3. Academic transcripts and course performance reports with a bar chart.
 
 ## Features
 
@@ -74,11 +81,13 @@ CGPA = sum of (GPA × credit hours) / sum of credit hours. A student passes a co
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/images/data-model.png" alt="ERD"></td>
-    <td width="50%"><img src="docs/images/flowchart.jpg" alt="Flowchart"></td>
+    <td width="33%"><img src="docs/images/data-model.png" alt="ERD"></td>
+    <td width="33%"><img src="docs/images/normalization.png" alt="Normalization"></td>
+    <td width="33%"><img src="docs/images/flowchart.jpg" alt="Flowchart"></td>
   </tr>
   <tr>
     <td align="center">ERD</td>
+    <td align="center">Normalization</td>
     <td align="center">Flowchart</td>
   </tr>
 </table>
@@ -120,5 +129,5 @@ StudentManagementSystemCppVersion/
 ├── database/
 │   ├── schema.sql
 │   └── sample_data.sql
-└── docs/                   # report, design and screenshots
+└── docs/                   # design and screenshots
 ```
