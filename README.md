@@ -90,7 +90,7 @@ Tables: `users`, `students`, `lecturers`, `courses` and `enrollments`. See [sche
 1. Install [XAMPP](https://www.apachefriends.org/) and start **MySQL** in the XAMPP Control Panel.
 2. Open phpMyAdmin, import `database/schema.sql`, then `database/sample_data.sql`.
 3. Install [MySQL Connector/C++ 8.0](https://dev.mysql.com/downloads/connector/cpp/) (Windows x64) to the default folder `C:\Program Files\MySQL\MySQL Connector C++ 8.0`.
-4. Open `StudentManagementSystem.sln` in Visual Studio 2022, choose **Release | x64** and run.
+4. Open `StudentManagementSystem.sln` in Visual Studio 2022, choose **x64** and run. The Connector DLLs are copied next to the `.exe` after each build.
 
 The program connects to `127.0.0.1:3306` as `root` with no password, the XAMPP default. Change it in `src/DBConnection.h` if yours is different.
 
