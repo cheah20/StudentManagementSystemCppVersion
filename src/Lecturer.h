@@ -125,7 +125,7 @@ public:
         Utils::header("My Students");
         try {
             unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
-                "SELECT e.course_code, s.matric_number, s.name, e.total_mark, e.grade, e.status "
+                "SELECT e.course_code, s.matric_number, s.name, e.total_mark, e.grade, e.gpa, e.status "
                 "FROM enrollments e JOIN courses c ON e.course_code = c.course_code "
                 "JOIN students s ON e.matric_number = s.matric_number "
                 "WHERE c.staff_id = ? ORDER BY e.course_code, s.matric_number"));
@@ -142,7 +142,8 @@ public:
                 cout << left << setw(11) << res->getString("course_code") << setw(13) << res->getString("matric_number")
                      << setw(30) << res->getString("name");
                 if (res->isNull("total_mark")) cout << setw(8) << "-" << setw(7) << "-";
-                else cout << setw(8) << fixed << setprecision(2) << res->getDouble("total_mark") << setw(7) << res->getString("grade");
+                else cout << setw(8) << fixed << setprecision(2) << res->getDouble("total_mark")
+                          << Utils::gradeColor(res->getDouble("gpa")) << setw(7) << res->getString("grade") << Utils::reset();
                 cout << res->getString("status") << endl;
             }
             if (!found) cout << "No students enrolled in your courses yet." << endl;
@@ -313,7 +314,8 @@ public:
             totalMark = round(totalMark * 100) / 100;
             auto gradeResult = calculateGrade(totalMark);
             cout << "\nCalculated Total Mark: " << fixed << setprecision(2) << totalMark << endl;
-            cout << "Grade: " << gradeResult.first << " (GPA: " << gradeResult.second << ")" << endl;
+            cout << "Grade: " << Utils::gradeColor(gradeResult.second) << gradeResult.first
+                 << " (GPA: " << gradeResult.second << ")" << Utils::reset() << endl;
 
             unique_ptr<sql::PreparedStatement> updatePstmt(conn->prepareStatement(
                 "UPDATE enrollments SET total_mark = ?, grade = ?, gpa = ?, status = 'COMPLETED' "
@@ -327,7 +329,7 @@ public:
 
             double cgpa = updateCgpa(matric);
             cout << "\n[SUCCESS] Marks updated successfully!" << endl;
-            cout << "Student's Updated CGPA: " << fixed << setprecision(2) << cgpa << endl;
+            cout << "Student's Updated CGPA: " << Utils::cgpaColor(cgpa) << fixed << setprecision(2) << cgpa << Utils::reset() << endl;
         }
         catch (sql::SQLException& e) {
             cout << "[ERROR] " << e.what() << endl;

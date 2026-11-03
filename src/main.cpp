@@ -17,7 +17,7 @@ int main() {
 
         string username = Utils::readLine("Username : ");
         if (username == "0") break;
-        string password = Utils::readLine("Password : ");
+        string password = Utils::readPassword("Password : ");
 
         try {
             unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(

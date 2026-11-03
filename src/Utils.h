@@ -6,6 +6,17 @@
 #include <string>
 #include <algorithm>
 #include <cstdlib>
+#include <cstdio>
+#ifdef _WIN32
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <conio.h>
+#include <io.h>
+#else
+#include <termios.h>
+#include <unistd.h>
+#endif
 #include "DBConnection.h"
 using namespace std;
 
@@ -21,11 +32,80 @@ namespace Utils {
         cout << "==================================================\n";
     }
 
+    // colours only show in a real console, not in piped output
+    inline bool useColor() {
+#ifdef _WIN32
+        static bool ok = [] {
+            HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
+            DWORD mode = 0;
+            return _isatty(_fileno(stdout)) && GetConsoleMode(out, &mode) &&
+                SetConsoleMode(out, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+        }();
+#else
+        static bool ok = isatty(STDOUT_FILENO);
+#endif
+        return ok;
+    }
+
+    inline string paint(const string& code) { return useColor() ? "\033[" + code + "m" : ""; }
+    inline string reset() { return paint("0"); }
+
+    // dean's bright cyan bold, pass cyan, near fail yellow, fail red
+    inline string gradeColor(double gpa) {
+        if (gpa >= 3.70) return paint("1;96");
+        if (gpa >= 2.00) return paint("36");
+        if (gpa >= 1.00) return paint("33");
+        return paint("31");
+    }
+
+    inline string cgpaColor(double cgpa) {
+        if (cgpa >= 3.50) return paint("1;96");
+        if (cgpa >= 2.50) return paint("36");
+        if (cgpa >= 2.00) return paint("33");
+        return paint("31");
+    }
+
     inline string readLine(const string& prompt) {
         cout << prompt;
         string s;
         if (!getline(cin, s)) exit(0);
         return s;
+    }
+
+    // shows * for each character
+    inline string readPassword(const string& prompt) {
+#ifdef _WIN32
+        if (!_isatty(_fileno(stdin))) return readLine(prompt);
+        cout << prompt;
+        string pass;
+        int ch;
+        while ((ch = _getch()) != '\r') {
+            if (ch == 0 || ch == 224) _getch();
+            else if (ch == '\b') {
+                if (!pass.empty()) { pass.pop_back(); cout << "\b \b"; }
+            }
+            else { pass += (char)ch; cout << '*'; }
+        }
+#else
+        termios old;
+        if (tcgetattr(STDIN_FILENO, &old) != 0) return readLine(prompt);
+        cout << prompt << flush;
+        termios raw = old;
+        raw.c_lflag &= ~(ICANON | ECHO);
+        tcsetattr(STDIN_FILENO, TCSANOW, &raw);
+
+        string pass;
+        char ch;
+        while (read(STDIN_FILENO, &ch, 1) == 1 && ch != '\n') {
+            if (ch == 127 || ch == '\b') {
+                if (!pass.empty()) { pass.pop_back(); cout << "\b \b" << flush; }
+            }
+            else { pass += ch; cout << '*' << flush; }
+        }
+        tcsetattr(STDIN_FILENO, TCSANOW, &old);
+#endif
+        cout << endl;
+        return pass;
     }
 
     inline void pause() {
@@ -88,7 +168,7 @@ namespace Utils {
             unique_ptr<sql::PreparedStatement> check(conn->prepareStatement(
                 "SELECT COUNT(*) AS cnt FROM users WHERE username = ? AND password = ?"));
             check->setString(1, username);
-            check->setString(2, readLine("Current password : "));
+            check->setString(2, readPassword("Current password : "));
             unique_ptr<sql::ResultSet> res(check->executeQuery());
 
             if (!res->next() || res->getInt("cnt") == 0) {
@@ -97,13 +177,13 @@ namespace Utils {
                 return;
             }
 
-            string newPass = readLine("New password     : ");
+            string newPass = readPassword("New password     : ");
             if (newPass.length() < 6) {
                 cout << "\n[ERROR] Password needs at least 6 characters." << endl;
                 pause();
                 return;
             }
-            if (readLine("Confirm password : ") != newPass) {
+            if (readPassword("Confirm password : ") != newPass) {
                 cout << "\n[ERROR] Passwords do not match." << endl;
                 pause();
                 return;

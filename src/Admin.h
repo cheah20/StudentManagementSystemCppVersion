@@ -125,7 +125,9 @@ public:
         try {
             unique_ptr<sql::Statement> stmt(conn->createStatement());
             unique_ptr<sql::ResultSet> res(stmt->executeQuery(
-                "SELECT matric_number, name, gender, semester, year, cgpa FROM students ORDER BY matric_number"));
+                "SELECT s.matric_number, s.name, s.gender, s.semester, s.year, s.cgpa, "
+                "(SELECT COUNT(*) FROM enrollments e WHERE e.matric_number = s.matric_number AND e.grade IS NOT NULL) AS graded "
+                "FROM students s ORDER BY s.matric_number"));
 
             cout << left << setw(13) << "Matric No" << setw(32) << "Name" << setw(12) << "Gender"
                  << setw(6) << "Sem" << setw(6) << "Year" << "CGPA" << endl;
@@ -136,7 +138,9 @@ public:
                 count++;
                 cout << left << setw(13) << res->getString("matric_number") << setw(32) << res->getString("name")
                      << setw(12) << res->getString("gender") << setw(6) << res->getInt("semester")
-                     << setw(6) << res->getInt("year") << fixed << setprecision(2) << res->getDouble("cgpa") << endl;
+                     << setw(6) << res->getInt("year");
+                double cgpa = res->getDouble("cgpa");
+                cout << (res->getInt("graded") ? Utils::cgpaColor(cgpa) : "") << fixed << setprecision(2) << cgpa << Utils::reset() << endl;
             }
             if (count == 0) cout << "No student records found." << endl;
             else cout << "\nTotal: " << count << " students" << endl;
@@ -153,11 +157,14 @@ public:
 
         try {
             unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
-                "SELECT * FROM students WHERE matric_number = ?"));
+                "SELECT s.*, (SELECT COUNT(*) FROM enrollments e WHERE e.matric_number = s.matric_number "
+                "AND e.grade IS NOT NULL) AS graded FROM students s WHERE s.matric_number = ?"));
             pstmt->setString(1, matric);
             unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
 
             if (res->next()) {
+                double cgpa = res->getDouble("cgpa");
+                string color = res->getInt("graded") ? Utils::cgpaColor(cgpa) : "";
                 cout << "\n=== STUDENT DETAILS ===" << endl;
                 cout << "Matric Number    : " << res->getString("matric_number") << endl;
                 cout << "Name             : " << res->getString("name") << endl;
@@ -170,8 +177,8 @@ public:
                 cout << "University Email : " << res->getString("uni_email") << endl;
                 cout << "Semester         : " << res->getInt("semester") << endl;
                 cout << "Year             : " << res->getInt("year") << endl;
-                cout << "GPA              : " << fixed << setprecision(2) << res->getDouble("gpa") << endl;
-                cout << "CGPA             : " << fixed << setprecision(2) << res->getDouble("cgpa") << endl;
+                cout << "GPA              : " << color << fixed << setprecision(2) << res->getDouble("gpa") << Utils::reset() << endl;
+                cout << "CGPA             : " << color << fixed << setprecision(2) << cgpa << Utils::reset() << endl;
             }
             else {
                 cout << "\n[ERROR] Student not found!" << endl;

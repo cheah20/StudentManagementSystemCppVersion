@@ -120,8 +120,9 @@ public:
                     continue;
                 }
                 graded = true;
-                cout << setw(8) << fixed << setprecision(2) << res->getDouble("total_mark")
-                     << setw(7) << res->getString("grade") << res->getDouble("gpa") << endl;
+                double gpa = res->getDouble("gpa");
+                cout << setw(8) << fixed << setprecision(2) << res->getDouble("total_mark") << Utils::gradeColor(gpa)
+                     << setw(7) << res->getString("grade") << gpa << Utils::reset() << endl;
             }
 
             if (!enrolled) cout << "You are not enrolled in any course yet." << endl;
@@ -130,8 +131,9 @@ public:
             if (info->next()) {
                 double cgpa = info->getDouble("cgpa");
                 cout << string(72, '-') << endl;
-                cout << "CGPA           : " << fixed << setprecision(2) << cgpa << endl;
-                cout << "Classification : " << (graded ? classify(cgpa) : "No results yet") << endl;
+                string color = graded ? Utils::cgpaColor(cgpa) : "";
+                cout << "CGPA           : " << color << fixed << setprecision(2) << cgpa << Utils::reset() << endl;
+                cout << "Classification : " << color << (graded ? classify(cgpa) : "No results yet") << Utils::reset() << endl;
             }
         }
         catch (sql::SQLException& e) {
@@ -221,8 +223,9 @@ public:
             cout << "Filename: " << filename << endl;
             cout << "\n--- Transcript Summary ---" << endl;
             cout << "Credits Earned : " << totalCredits << endl;
-            cout << "CGPA           : " << fixed << setprecision(2) << cgpa << endl;
-            cout << "Classification : " << classification << endl;
+            string color = hasRecords ? Utils::cgpaColor(cgpa) : "";
+            cout << "CGPA           : " << color << fixed << setprecision(2) << cgpa << Utils::reset() << endl;
+            cout << "Classification : " << color << classification << Utils::reset() << endl;
         }
         catch (sql::SQLException& e) {
             cout << "[ERROR] " << e.what() << endl;

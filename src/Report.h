@@ -17,6 +17,7 @@ struct GradeStats {
 namespace Report {
     // highest grade first
     const string GRADES[] = { "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "E" };
+    const double POINTS[] = { 4.00, 3.70, 3.30, 3.00, 2.70, 2.30, 2.00, 1.70, 1.30, 1.00, 0.00 };
 
     inline GradeStats loadGrades(sql::Connection* conn, const string& courseCode) {
         GradeStats s;
@@ -52,13 +53,18 @@ namespace Report {
         out << "Lecturer     : " << lecturer << "\n";
         out << "========================================\n\n";
 
+        // no colour codes inside exported files
+        bool screen = &out == &cout;
+        auto color = [&](double points) { return screen ? Utils::gradeColor(points) : ""; };
+        string reset = screen ? Utils::reset() : "";
+
         out << "Grade Distribution:\n";
         out << "-------------------\n";
-        for (const string& g : GRADES) {
-            if (!s.byGrade.count(g)) continue;
-            int count = s.byGrade.at(g);
-            out << "Grade " << left << setw(3) << g << ": " << right << setw(3) << count
-                << " students (" << fixed << setprecision(1) << s.percent(count) << "%)\n";
+        for (int i = 0; i < 11; i++) {
+            if (!s.byGrade.count(GRADES[i])) continue;
+            int count = s.byGrade.at(GRADES[i]);
+            out << color(POINTS[i]) << "Grade " << left << setw(3) << GRADES[i] << ": " << right << setw(3) << count
+                << " students (" << fixed << setprecision(1) << s.percent(count) << "%)" << reset << "\n";
         }
         out << "\nTotal Students: " << s.total << "\n";
 
@@ -66,8 +72,10 @@ namespace Report {
         out << "Grade     : Students\n";
         out << "-----------------------------\n";
         pair<string, int> bars[] = { {"A", s.a}, {"B", s.b}, {"C", s.c}, {"D", s.d}, {"E", s.e} };
-        for (auto& bar : bars)
-            out << "Grade " << bar.first << "   : " << string(bar.second, '|') << " (" << bar.second << ")\n";
+        const double barPoints[] = { 4.00, 3.00, 2.00, 1.00, 0.00 };
+        for (int i = 0; i < 5; i++)
+            out << "Grade " << bars[i].first << "   : " << color(barPoints[i]) << string(bars[i].second, '|') << reset
+                << " (" << bars[i].second << ")\n";
         out << "-----------------------------\n";
 
         out << "\nPass Rate: " << fixed << setprecision(1) << s.passRate() << "% ("
