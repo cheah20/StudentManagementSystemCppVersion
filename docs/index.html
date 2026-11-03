@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Student Management System</title>
+<meta name="description" content="C++ console student management system with MySQL, Workshop I project at UTeM.">
+<style>
+:root {
+  /* the page is the console window: black screen, grey text, the program's own banners and numbered menu */
+  --screen: #0c0c0c;
+  --text: #cccccc;
+  --dim: #8b8b8b;
+  --titlebar: #3bbde4;
+  --dean: #61d6d6;
+  --pass: #3a96dd;
+  --near: #c19c00;
+  --fail: #e74856;
+  --rule: #2b2b2b;
+  --mono: "Cascadia Mono", Consolas, "Courier New", monospace;
+  --ui: "Segoe UI", Tahoma, Arial, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--screen); color: var(--text); font: 16px/1.6 var(--ui); }
+a { color: inherit; }
+a:focus-visible { outline: 2px dashed var(--dean); outline-offset: 3px; }
+.titlebar { background: var(--titlebar); color: #fff; font: 13px var(--ui); padding: 7px 14px; display: flex; gap: 10px; align-items: center; }
+.titlebar .icon { width: 15px; height: 13px; background: #1e3a66; border-radius: 2px; }
+.titlebar .controls { margin-left: auto; letter-spacing: 18px; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+pre { font: 15px/1.45 var(--mono); margin: 0; white-space: pre-wrap; }
+.banner { color: var(--text); overflow-x: auto; }
+header.top { padding: 26px 0 8px; display: grid; gap: 14px; }
+h1 { font: 700 15px/1.45 var(--mono); margin: 0; }
+.intro { max-width: 66ch; margin: 0; }
+.intro .dim { color: var(--dim); }
+.menu { list-style: none; margin: 6px 0 0; padding: 0; font: 15px/1.7 var(--mono); }
+.menu a { text-decoration: none; }
+.menu a:hover { color: #fff; text-decoration: underline; }
+.prompt { font: 15px var(--mono); margin: 2px 0 0; }
+.prompt::after { content: "_"; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .prompt::after { animation: none; } }
+main { display: grid; gap: 56px; padding: 34px 0 56px; }
+section { display: grid; gap: 12px; scroll-margin-top: 16px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.lead { margin: 0; color: var(--dim); }
+.screens { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px; align-items: start; margin-top: 6px; }
+figure { margin: 0; display: grid; gap: 8px; }
+.shot { display: block; border: 1px solid #3a3a3a; }
+.shot img { display: block; width: 100%; height: auto; }
+figcaption { font-size: 14px; color: var(--dim); }
+figcaption b { display: block; color: var(--text); font-size: 15px; }
+.grading { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px; }
+table { border-collapse: collapse; width: 100%; font: 14px/1.5 var(--mono); font-variant-numeric: tabular-nums; }
+caption { text-align: left; font: 700 14px var(--mono); padding-bottom: 8px; color: var(--text); }
+th, td { text-align: left; padding: 4px 8px 4px 0; border-bottom: 1px dashed var(--rule); vertical-align: top; }
+th { color: var(--dim); font-weight: 400; }
+.dean { color: var(--dean); font-weight: 700; } .pass { color: var(--pass); } .near { color: var(--near); } .fail { color: var(--fail); }
+.formula { margin: 0; color: var(--dim); font-size: 15px; }
+.formula code { font-family: var(--mono); color: var(--text); }
+footer { border-top: 1px solid var(--rule); padding: 20px 0 40px; color: var(--dim); font-size: 14px; }
+footer code { font-family: var(--mono); color: var(--text); }
+@media (max-width: 640px) { .screens { grid-template-columns: 1fr; } .titlebar .controls { display: none; } pre, .menu { font-size: 13px; } }
+</style>
+</head>
+<body>
+<div class="titlebar" aria-hidden="true"><span class="icon"></span>StudentManagementSystem.exe<span class="controls">&#8211;&#9633;&#215;</span></div>
+<div class="wrap">
+  <header class="top">
+    <pre class="banner" aria-hidden="true">==================================================
+  STUDENT MANAGEMENT SYSTEM - Main Menu
+==================================================</pre>
+    <h1>Student Management System (C++ Version)</h1>
+    <p class="intro">A console program for my Year 2 Workshop I project at UTeM. Admin keeps the student, lecturer and course records, lecturers key in marks, and students check their results. Grades, GPA and CGPA follow the UTeM scale, and everything is saved in MySQL through MySQL Connector/C++. <span class="dim">Every screen below is a real screenshot of the program running in a Windows console with the made-up sample data.</span></p>
+    <ul class="menu"><li><a href="#login">1. Login</a></li><li><a href="#admin">2. Admin</a></li><li><a href="#lecturer">3. Lecturer</a></li><li><a href="#student">4. Student</a></li><li><a href="#grading">5. Grading</a></li><li><a href="https://github.com/cheah20/StudentManagementSystemCppVersion">6. Source on GitHub</a></li></ul>
+    <p class="prompt">Choose an option: </p>
+  </header>
+  <main>
+<section id="login"><pre class="banner" aria-hidden="true">==================================================
+  STUDENT MANAGEMENT SYSTEM - Login
+==================================================</pre><h2 class="sr">Login</h2><p class="lead">Admin, lecturers and students all start here. Each role only gets its own menu.</p><div class="screens"><figure><a class="shot" href="screenshots/login.png"><img src="screenshots/login.png" alt="Login screen" loading="lazy"></a><figcaption><b>Login</b> The password shows as * while typing.</figcaption></figure><figure><a class="shot" href="screenshots/admin-menu.png"><img src="screenshots/admin-menu.png" alt="Admin Dashboard screen" loading="lazy"></a><figcaption><b>Admin Dashboard</b> Users, courses and the course grade report.</figcaption></figure></div></section><section id="admin"><pre class="banner" aria-hidden="true">==================================================
+  STUDENT MANAGEMENT SYSTEM - Admin
+==================================================</pre><h2 class="sr">Admin</h2><p class="lead">Keeps student, lecturer and course records.</p><div class="screens"><figure><a class="shot" href="screenshots/admin-people.png"><img src="screenshots/admin-people.png" alt="User Add On screen" loading="lazy"></a><figcaption><b>User Add On</b> Add, view, search, update and delete people.</figcaption></figure><figure><a class="shot" href="screenshots/view-students.png"><img src="screenshots/view-students.png" alt="View All Students screen" loading="lazy"></a><figcaption><b>View All Students</b> CGPA in the four grade colours.</figcaption></figure><figure><a class="shot" href="screenshots/add-student.png"><img src="screenshots/add-student.png" alt="Add Student screen" loading="lazy"></a><figcaption><b>Add Student</b> The matric number, uni email and first password are made for you.</figcaption></figure><figure><a class="shot" href="screenshots/search-student.png"><img src="screenshots/search-student.png" alt="Search Student screen" loading="lazy"></a><figcaption><b>Search Student</b> Full details for one matric number.</figcaption></figure><figure><a class="shot" href="screenshots/view-lecturers.png"><img src="screenshots/view-lecturers.png" alt="View All Lecturers screen" loading="lazy"></a><figcaption><b>View All Lecturers</b> Staff ID, name and department.</figcaption></figure><figure><a class="shot" href="screenshots/view-courses.png"><img src="screenshots/view-courses.png" alt="View All Courses screen" loading="lazy"></a><figcaption><b>View All Courses</b> Credit hours, semester and the lecturer in charge.</figcaption></figure><figure><a class="shot" href="screenshots/course-grade-report.png"><img src="screenshots/course-grade-report.png" alt="Course Grade Report screen" loading="lazy"></a><figcaption><b>Course Grade Report</b> Grade spread, bar chart and pass rate, saved as CSV.</figcaption></figure></div></section><section id="lecturer"><pre class="banner" aria-hidden="true">==================================================
+  STUDENT MANAGEMENT SYSTEM - Lecturer
+==================================================</pre><h2 class="sr">Lecturer</h2><p class="lead">Marks and reports for the lecturer&#x27;s own courses.</p><div class="screens"><figure><a class="shot" href="screenshots/lecturer-menu.png"><img src="screenshots/lecturer-menu.png" alt="Lecturer Dashboard screen" loading="lazy"></a><figcaption><b>Lecturer Dashboard</b> Courses, students, enrolment, marks and reports.</figcaption></figure><figure><a class="shot" href="screenshots/my-courses.png"><img src="screenshots/my-courses.png" alt="My Courses screen" loading="lazy"></a><figcaption><b>My Courses</b> With how many students are enrolled.</figcaption></figure><figure><a class="shot" href="screenshots/my-students.png"><img src="screenshots/my-students.png" alt="My Students screen" loading="lazy"></a><figcaption><b>My Students</b> Marks and grades for every course taught.</figcaption></figure><figure><a class="shot" href="screenshots/key-in-marks.png"><img src="screenshots/key-in-marks.png" alt="Key In Marks screen" loading="lazy"></a><figcaption><b>Key In Marks</b> Weights follow the credit hours, the CGPA updates straight away.</figcaption></figure><figure><a class="shot" href="screenshots/course-performance-report.png"><img src="screenshots/course-performance-report.png" alt="Course Performance Report screen" loading="lazy"></a><figcaption><b>Course Performance Report</b> Export to CSV or a text file.</figcaption></figure></div></section><section id="student"><pre class="banner" aria-hidden="true">==================================================
+  STUDENT MANAGEMENT SYSTEM - Student
+==================================================</pre><h2 class="sr">Student</h2><p class="lead">Read only access to their own records.</p><div class="screens"><figure><a class="shot" href="screenshots/student-menu.png"><img src="screenshots/student-menu.png" alt="Student Dashboard screen" loading="lazy"></a><figcaption><b>Student Dashboard</b> Profile, courses, results, transcript and password.</figcaption></figure><figure><a class="shot" href="screenshots/profile.png"><img src="screenshots/profile.png" alt="My Profile screen" loading="lazy"></a><figcaption><b>My Profile</b> Personal and university details.</figcaption></figure><figure><a class="shot" href="screenshots/enrolled-courses.png"><img src="screenshots/enrolled-courses.png" alt="Enrolled Courses screen" loading="lazy"></a><figcaption><b>Enrolled Courses</b> Every course with its status.</figcaption></figure><figure><a class="shot" href="screenshots/performance.png"><img src="screenshots/performance.png" alt="Academic Performance screen" loading="lazy"></a><figcaption><b>Academic Performance</b> Marks, grades, CGPA and class of degree.</figcaption></figure><figure><a class="shot" href="screenshots/transcript.png"><img src="screenshots/transcript.png" alt="Generate Transcript screen" loading="lazy"></a><figcaption><b>Generate Transcript</b> Saved as a text file.</figcaption></figure></div></section>
+    <section id="grading">
+      <pre class="banner" aria-hidden="true">==================================================
+  STUDENT MANAGEMENT SYSTEM - Grading
+==================================================</pre>
+      <h2 class="sr">Grading</h2>
+      <div class="grading">
+        <table>
+          <caption>Weightage by credit hours</caption>
+          <tr><th>Credits</th><th>Components</th></tr>
+          <tr><td>3</td><td>Assignment 10%, Quiz 1 5%, Quiz 2 5%, Midterm 20%, Project 20%, Lab 10%, Final 30%</td></tr>
+          <tr><td>2</td><td>Assignment 1 30%, Assignment 2 40%, Final 30%</td></tr>
+          <tr><td>1</td><td>Test 100% (co-curriculum)</td></tr>
+        </table>
+        <table>
+          <caption>Grade scale and screen colour</caption>
+          <tr><th>Mark</th><th>Grade</th><th>GPA</th></tr>
+          <tr class="dean"><td>80+</td><td>A</td><td>4.00</td></tr>
+          <tr class="dean"><td>75+</td><td>A-</td><td>3.70</td></tr>
+          <tr class="pass"><td>70+ / 65+ / 60+</td><td>B+ / B / B-</td><td>3.30 / 3.00 / 2.70</td></tr>
+          <tr class="pass"><td>55+ / 50+</td><td>C+ / C</td><td>2.30 / 2.00</td></tr>
+          <tr class="near"><td>47+ / 44+ / 40+</td><td>C- / D+ / D</td><td>1.70 / 1.30 / 1.00</td></tr>
+          <tr class="fail"><td>below 40</td><td>E</td><td>0.00</td></tr>
+        </table>
+        <table>
+          <caption>CGPA colour</caption>
+          <tr><th>CGPA</th><th>Meaning</th></tr>
+          <tr class="dean"><td>3.50 and above</td><td>Dean's List</td></tr>
+          <tr class="pass"><td>2.50 to 3.49</td><td>Pass and upper</td></tr>
+          <tr class="near"><td>2.00 to 2.49</td><td>Close to failing</td></tr>
+          <tr class="fail"><td>below 2.00</td><td>Fail</td></tr>
+        </table>
+      </div>
+      <p class="formula"><code>CGPA = sum(GPA x credit hours) / sum(credit hours)</code>. A course is passed with 40 marks or more.</p>
+    </section>
+  </main>
+  <footer>Run it yourself: start MySQL in XAMPP, import <code>database/schema.sql</code> and <code>database/sample_data.sql</code>, then open <code>StudentManagementSystem.sln</code> in Visual Studio 2022. Faculty of Artificial Intelligence and Cyber Security, UTeM. All names and IC numbers in the sample data are made up.</footer>
+</div>
+</body>
+</html>
